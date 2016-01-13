@@ -4,22 +4,45 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=no">
-<link rel="stylesheet" type="text/css" href="static/leeui.min.css?v=1.9.9">
+<link rel="stylesheet" type="text/css" href="build/main.css">
 <script type="text/javascript" src="build/main.js"></script>
 <style type="text/css">
-	.item{
-		width:30%;
-		height:100px;
-		line-height: 100px;
-		float:left;
-	}
+	 
+ 
 </style>
 </head>
 <body>
-	<div id="timer">30</div>
-	<button id="stop" data-active=true>暂停</button>
-	<div id="app">
+	<header id="header">
+		<div id="score-box">
+			<div class="score">
+				SCORE: 0
+			</div>
+			<div class="time">
+				TIME: <span id="timer">30</span> S
+			</div>
+ 
+		</div>
+		<!--doing|pause|end-->
+		<button class="pause-button stop" data-active='end'>
+			<img src="img/pause.png" border="0">
+		</button>
+	</header>
+	 
+	 
+	<div id="app" class="item-box">
+	</div>
 
+	<div id="pause-layout" class="layout">
+		<img src="img/pausePage.png">
+		<button class="pause-button button stop" data-active='end'>
+			<img src="img/goonbutton.png" border="0">
+		</button>
+	</div>
+	<div id="start-layout" class="layout">
+		<img src="img/startPage.png">
+		<button class=" button start stop" data-active='end'>
+			<img src="img/startbutton.png" border="0">
+		</button>
 	</div>
 </body>
 </html>

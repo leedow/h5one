@@ -72,12 +72,11 @@
 		init: function(){//初始化事件绑定
 			var _this = this;
 			stageModule.init();
-			_this.start();
+			//_this.start();
 			 
 			$(document).on('click', '.item', function(){
-
 				if(!_this.active){
-					alert('游戏结束了');
+					alert('游戏停止');
 					return;
 				}
 
@@ -91,50 +90,87 @@
 				}
 			});
 
-			$(document).on('click', '#stop', function(){
-				if($(this).data('active')){
-					$(this).data('active', false);
-					_this.stop();
-				} else {
-					$(this).data('active', true);
-					_this.start();
+			$(document).on('click', '.stop', function(){
+				switch($(this).data('active')){
+					case 'doing': {
+						$('.stop').data('active', 'pause');//.text('继续');;
+						$('#pause-layout').css('display', 'block');
+						_this.stop();
+						break;
+					}
+					case 'pause': {
+						$('.stop').data('active', 'doing');//.text('暂停');
+						$('#pause-layout').css('display', 'none');
+						_this.start();
+						break;
+					}
+					case 'end': {
+						$('.stop').data('active', 'doing');//.text('暂停');
+						$('#start-layout').css('display', 'none');
+						_this.start();
+						break;
+					}
 				}
+				 
 			});
+
+			 
 		},
 		start: function(){
 			var _this = this;	 
+			_this.active = true;
+
 			_this.timer = setInterval(function(){
-				_this.timeLimit--
-				if(_this.timeLimit == 0){
+				_this.timeLimit--;
+				$('#timer').text(_this.timeLimit);
+				if(_this.timeLimit <= 0){
 					clearInterval(_this.timer);
 					_this.over();
 					return false;
 				}
-				$('#timer').text(_this.timeLimit);
+				 
 
 			}, 1000)
 		},
 		stop: function(){
 			var _this = this;
+			_this.active = false;
 			clearInterval(_this.timer);
 		},
 		over: function(){//游戏结束
 			var _this = this;
 			_this.active = false;
+			_this.timeLimit = 30;
+			$('.stop').data('active', 'end');//.text('开始');
 			alert('游戏结束');
+			clearInterval(_this.timer);
 		},
-		refresh: function(){//刷新页面关数
+		refresh: function(){//刷新页面关数内容
 			var _this = this;
 			var data = stageModule.getCurrentData();
+			var x = data.size.x;
+			var y = data.size.y;
+			var total = x*y;
 			var stage = stageModule.getCurrentStage();
-			var tmp = '<div class="item" data-type="answer">' + 
-					data.answer.content + '</div>';
 
-			for(var i=0; i<8; i++){
-				tmp += '<div class="item" data-type="other">' + 
-						data.other.content + '</div>';
+			var position = Math.floor(Math.random()*total);//随机插入答案的位置
+			var tmp = '';
+			 
+			for(var i=0; i<total; i++){			 
+					tmp += '<div class="col-4 item-col"><div class="item"></div></div>';		 
 			}
 			$('#app').html(tmp);
+
+			var items = document.getElementsByClassName('item');
+			for(var i=0; i<total; i++){			 
+				if(position == i){
+					items[i].setAttribute('data-type', 'answer');
+					items[i].appendChild(data.answer.img);
+				} else {
+					items[i].setAttribute('data-type', 'other');
+					items[i].appendChild(data.other.img.cloneNode());
+				}
+			}
 		}
 	}
 
@@ -186,22 +222,376 @@
 	var data = [{//第一关
 		answer: {
 			name: 'test1',
-			content: '第一关answer'
+			imgUrl: 'img/1/1.png',
+			img: null//缓存图片对象
 		}, 
 		other: {
 			name: 'test2',
-			content: '第一关other'
+			imgUrl: 'img/1/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
 		}
 	},{//第二关
 		answer: {
-			name: 'test3',
-			content: '第二关answer'
+			name: 'test1',
+			imgUrl: 'img/2/1.png',
+			img: null//缓存图片对象
 		}, 
 		other: {
-			name: 'test4',
-			content: '第二关other'
+			name: 'test2',
+			imgUrl: 'img/2/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第3关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/3/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/3/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第4关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/4/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/4/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第5关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/5/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/5/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第6关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/6/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/6/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第7关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/7/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/7/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第8关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/8/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/8/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第9关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/9/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/9/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第10关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/10/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/10/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第11关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/11/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/11/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第12关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/12/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/12/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第13关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/13/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/13/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第14关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/14/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/14/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第15关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/15/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/15/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第16关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/16/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/16/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第17关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/17/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/17/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第18关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/18/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/18/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第19关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/4/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/4/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第20关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/4/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/4/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第21关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/4/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/4/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第22关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/4/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/4/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第23关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/4/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/4/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
+		}
+	},{//第24关
+		answer: {
+			name: 'test1',
+			imgUrl: 'img/4/1.png',
+			img: null//缓存图片对象
+		}, 
+		other: {
+			name: 'test2',
+			imgUrl: 'img/4/5.png',
+			img: null
+		},
+		size: {
+			x: 2,
+			y: 2
 		}
 	}]
+
+	var _buffer = function(){//缓存图片数据
+		for(var i=0; i<data.length; i++){
+			data[i].answer.img = new Image();
+			data[i].answer.img.src = data[i].answer.imgUrl;
+			data[i].other.img = new Image();
+			data[i].other.img.src = data[i].other.imgUrl;
+		}
+	}
+
+	_buffer();
+
 
 	module.exports.getData = function(stage){
 		stage--;

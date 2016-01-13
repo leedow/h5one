@@ -11,7 +11,7 @@ var rev				= require('gulp-rev');
 
 gulp.task('css', function(){
 	watch('./style/**/*.less', function(){
-		gulp.src('./style/bone.less')
+		gulp.src('./style/main.less')
 			.pipe(less())
 			.on('error', function(err) {
 				gutil.log('Less Error!', err.message);
@@ -41,5 +41,5 @@ gulp.task('js', function(callback){
 
  
 gulp.task('default', function(){
-	gulp.run([ 'js']);
+	gulp.run([ 'js', 'css']);
 });
