@@ -64,6 +64,25 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var stageModule = __webpack_require__(3);
+	var levelModule = __webpack_require__(6);
+	var musicModule = __webpack_require__(7);
+	var move = {
+		show: function(aim){
+			$(aim).css('display', 'block').addClass('show');
+			var _t = $(aim);
+			setTimeout(function(){
+				_t.removeClass('show');
+			},150);	
+		},
+		hide: function(aim){
+			$(aim).addClass('hide');
+			var _t = $(aim);
+			setTimeout(function(){			 
+				$(aim).css('display', 'none');
+				_t.removeClass('hide');
+			},150);	
+		}
+	}
 
 	var action = {
 		timer: null,
@@ -73,59 +92,122 @@
 			var _this = this;
 			stageModule.init();
 			//_this.start();
+			var w = $('body').width();
+			//var h = $('body').
+			//$('body').css('height', h); 
+			//$('.layout').css('height', h);
 			 
 			$(document).on('click', '.item', function(){
 				if(!_this.active){
-					alert('游戏停止');
+				 
 					return;
 				}
 
 				var type = $(this).data('type');
-				if(type == 'answer'){
-					alert('进入下一关');
+				if(type == 'answer'){ 
 					stageModule.passStage();
 					_this.refresh();
 				} else {
-					alert('点错啦');
+					$(this).addClass('error');
+					var _t = $(this);
+					setTimeout(function(){
+						_t.removeClass('error');
+					},1000);				 
 				}
 			});
 
-			$(document).on('click', '.stop', function(){
-				switch($(this).data('active')){
-					case 'doing': {
-						$('.stop').data('active', 'pause');//.text('继续');;
-						$('#pause-layout').css('display', 'block');
-						_this.stop();
-						break;
-					}
-					case 'pause': {
-						$('.stop').data('active', 'doing');//.text('暂停');
-						$('#pause-layout').css('display', 'none');
-						_this.start();
-						break;
-					}
-					case 'end': {
-						$('.stop').data('active', 'doing');//.text('暂停');
-						$('#start-layout').css('display', 'none');
-						_this.start();
-						break;
-					}
-				}
-				 
+			$(document).on('click', '#pause', function(){	 
+				_this.stop();
+		 
 			});
 
+			$(document).on('click', '#start', function(){
+				 _this.start();			 
+			});
+
+			$(document).on('click', '#restart', function(){
+				 _this.start();		
+				 _this.refresh();	 
+			});
+
+			$(document).on('click', '#goon', function(){
 			 
+				 _this.start();			 
+			});
+			 
+		},
+		layout: {
+			start: {
+				dom: '#start-layout',
+				show: function(){
+					move.show(this.dom);
+				},
+				hide: function(){			 
+					move.hide(this.dom); 
+				}
+			},
+			restart: {
+				dom: '#restart-layout',
+				show: function(){
+					move.show(this.dom);
+				},
+				hide: function(){
+					move.hide(this.dom); 
+				}
+			},
+			end: {
+				dom: '#end-layout',
+				show: function(){
+					move.show(this.dom);
+				},
+				hide: function(){
+					move.hide(this.dom); 
+				}
+			},
+			pause: {
+				dom: '#pause-layout',
+				show: function(){
+					move.show(this.dom);
+				},
+				hide: function(){
+					move.hide(this.dom); 
+				}
+			},
+			action: {
+				show: function(aim){
+					$(aim).addClass('show');
+					var _t = $(aim);
+					setTimeout(function(){
+						_t.removeClass('show');
+					},1000);	
+				},
+				hide: function(aim){
+					$(aim).addClass('hide');
+					var _t = $(aim);
+					setTimeout(function(){
+						_t.removeClass('hide');
+					},1000);	
+				}
+			}
 		},
 		start: function(){
 			var _this = this;	 
 			_this.active = true;
 
+			_this.layout.start.hide();
+			_this.layout.end.hide();
+			_this.layout.restart.hide();
+			_this.layout.pause.hide();
+
+			clearInterval(_this.timer);
+
 			_this.timer = setInterval(function(){
 				_this.timeLimit--;
 				$('#timer').text(_this.timeLimit);
 				if(_this.timeLimit <= 0){
-					clearInterval(_this.timer);
+					
 					_this.over();
+					clearInterval(_this.timer);
 					return false;
 				}
 				 
@@ -135,44 +217,94 @@
 		stop: function(){
 			var _this = this;
 			_this.active = false;
+			_this.layout.pause.show();
 			clearInterval(_this.timer);
+		 
 		},
 		over: function(){//游戏结束
 			var _this = this;
 			_this.active = false;
 			_this.timeLimit = 30;
 			$('.stop').data('active', 'end');//.text('开始');
-			alert('游戏结束');
+			//alert('游戏结束');
 			clearInterval(_this.timer);
+			_this.layout.restart.show();
+			var stage = stageModule.getCurrentStage();
+			var level = levelModule.getLevel(stage);
+			$('#r_l').text(stage);
+			$('#r_s').text(level);
+			stageModule.init();
 		},
 		refresh: function(){//刷新页面关数内容
 			var _this = this;
 			var data = stageModule.getCurrentData();
+			 
 			var x = data.size.x;
 			var y = data.size.y;
 			var total = x*y;
-			var stage = stageModule.getCurrentStage();
+			var stage = stageModule.getCurrentStage();//当前关数
+			var totalStage = stageModule.getTotalStage();//总关数
+
+			if(stage > totalStage){
+				_this.layout.end.show();
+				clearInterval(_this.timer);
+				return;
+			}
+
+
+			$('#score-num').text(stage-1);
 
 			var position = Math.floor(Math.random()*total);//随机插入答案的位置
 			var tmp = '';
 			 
 			for(var i=0; i<total; i++){			 
-					tmp += '<div class="col-4 item-col"><div class="item"></div></div>';		 
+					tmp += '<div class="col-4 item-col show"><div class="item"></div></div>';		 
 			}
 			$('#app').html(tmp);
 
 			var items = document.getElementsByClassName('item');
-			for(var i=0; i<total; i++){			 
-				if(position == i){
-					items[i].setAttribute('data-type', 'answer');
-					items[i].appendChild(data.answer.img);
-				} else {
-					items[i].setAttribute('data-type', 'other');
-					items[i].appendChild(data.other.img.cloneNode());
+
+
+			//计算图片高度
+			var h = $('body').height();
+			var picHeight = Math.floor((h-96-10-20-16)/2);
+
+			if(data.other instanceof Array){//特殊关卡
+				var num = 0;
+				for(var i=0; i<total; i++){	
+
+					if(position == i){
+						items[i].setAttribute('data-type', 'answer');
+						data.answer.img.style.height = picHeight + 'px';
+						items[i].appendChild(data.answer.img);
+					} else {
+						items[i].setAttribute('data-type', 'other');
+						var chi = data.other[num];
+						chi.img.style.height = picHeight + 'px';
+						num++;
+						items[i].appendChild(chi.img.cloneNode());
+					}
+				}
+			} else {
+				for(var i=0; i<total; i++){			 
+					if(position == i){
+						items[i].setAttribute('data-type', 'answer');
+						data.answer.img.style.height = picHeight + 'px';
+						items[i].appendChild(data.answer.img);
+					} else {
+						items[i].setAttribute('data-type', 'other');
+						data.other.img.style.height = picHeight + 'px';
+						items[i].appendChild(data.other.img.cloneNode());
+					}
 				}
 			}
+
+			 
+			
 		}
 	}
+
+
 
 	module.exports = action;
 
@@ -190,6 +322,7 @@
 		init: function(){
 			var _this = this;
 			_this.currentData = storage.getData(1);
+			_this.currentStage = 1;
 			_this.totalStage = storage.getLength();
 		},
 		check: function(name){//检查是否正确
@@ -200,6 +333,9 @@
 		},
 		getCurrentStage: function(){
 			return this.currentStage;
+		},
+		getTotalStage: function(){
+			return this.totalStage;
 		},
 		passStage: function(){//更新下关数据
 			var _this = this;
@@ -217,376 +353,204 @@
 
 /***/ },
 /* 4 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
+
+	var loading = __webpack_require__(5);
 
 	var data = [{//第一关
 		answer: {
 			name: 'test1',
-			imgUrl: 'img/1/1.png',
+			imgUrl: 'img/1/1-(2).png',
 			img: null//缓存图片对象
 		}, 
 		other: {
 			name: 'test2',
-			imgUrl: 'img/1/5.png',
+			imgUrl: 'img/1/5-(2).png',
 			img: null
 		},
 		size: {
-			x: 2,
+			x: 3,
 			y: 2
 		}
 	},{//第二关
 		answer: {
 			name: 'test1',
-			imgUrl: 'img/2/1.png',
+			imgUrl: 'img/2/1-(2).png',
 			img: null//缓存图片对象
 		}, 
 		other: {
 			name: 'test2',
-			imgUrl: 'img/2/5.png',
+			imgUrl: 'img/2/5-(2).png',
 			img: null
 		},
 		size: {
-			x: 2,
+			x: 3,
 			y: 2
 		}
 	},{//第3关
 		answer: {
 			name: 'test1',
-			imgUrl: 'img/3/1.png',
+			imgUrl: 'img/3/1-(2).png',
 			img: null//缓存图片对象
 		}, 
 		other: {
 			name: 'test2',
-			imgUrl: 'img/3/5.png',
+			imgUrl: 'img/3/5-(2).png',
 			img: null
 		},
 		size: {
-			x: 2,
+			x: 3,
 			y: 2
 		}
 	},{//第4关
 		answer: {
 			name: 'test1',
-			imgUrl: 'img/4/1.png',
+			imgUrl: 'img/4/1-(2).png',
 			img: null//缓存图片对象
 		}, 
 		other: {
 			name: 'test2',
-			imgUrl: 'img/4/5.png',
+			imgUrl: 'img/4/5-(2).png',
 			img: null
 		},
 		size: {
-			x: 2,
+			x: 3,
 			y: 2
 		}
 	},{//第5关
 		answer: {
 			name: 'test1',
-			imgUrl: 'img/5/1.png',
+			imgUrl: 'img/5/1-(2).png',
 			img: null//缓存图片对象
 		}, 
 		other: {
 			name: 'test2',
-			imgUrl: 'img/5/5.png',
+			imgUrl: 'img/5/5-(2).png',
 			img: null
 		},
 		size: {
-			x: 2,
+			x: 3,
 			y: 2
 		}
 	},{//第6关
 		answer: {
 			name: 'test1',
-			imgUrl: 'img/6/1.png',
+			imgUrl: 'img/6/1-(2).png',
 			img: null//缓存图片对象
 		}, 
 		other: {
 			name: 'test2',
-			imgUrl: 'img/6/5.png',
+			imgUrl: 'img/6/5-(2).png',
 			img: null
 		},
 		size: {
-			x: 2,
+			x: 3,
 			y: 2
 		}
 	},{//第7关
 		answer: {
 			name: 'test1',
-			imgUrl: 'img/7/1.png',
+			imgUrl: 'img/7/1-(2).png',
 			img: null//缓存图片对象
 		}, 
 		other: {
 			name: 'test2',
-			imgUrl: 'img/7/5.png',
+			imgUrl: 'img/7/5-(2).png',
 			img: null
 		},
 		size: {
-			x: 2,
+			x: 3,
 			y: 2
 		}
 	},{//第8关
 		answer: {
 			name: 'test1',
-			imgUrl: 'img/8/1.png',
+			imgUrl: 'img/8/1-(2).png',
 			img: null//缓存图片对象
 		}, 
 		other: {
 			name: 'test2',
-			imgUrl: 'img/8/5.png',
+			imgUrl: 'img/8/5-(2).png',
 			img: null
 		},
 		size: {
-			x: 2,
+			x: 3,
 			y: 2
 		}
 	},{//第9关
 		answer: {
 			name: 'test1',
-			imgUrl: 'img/9/1.png',
+			imgUrl: 'img/9/1-(2).png',
 			img: null//缓存图片对象
 		}, 
 		other: {
 			name: 'test2',
-			imgUrl: 'img/9/5.png',
+			imgUrl: 'img/9/5-(2).png',
 			img: null
 		},
 		size: {
-			x: 2,
+			x: 3,
 			y: 2
 		}
-	},{//第10关
+	},{//第10关 特殊关卡
 		answer: {
 			name: 'test1',
-			imgUrl: 'img/10/1.png',
+			imgUrl: 'img/10/s.png',
 			img: null//缓存图片对象
 		}, 
-		other: {
+		other: [{
+			name: 'test2',
+			imgUrl: 'img/10/1.png',
+			img: null
+		},{
+			name: 'test2',
+			imgUrl: 'img/10/2.png',
+			img: null
+		},{
+			name: 'test2',
+			imgUrl: 'img/10/3.png',
+			img: null
+		},{
+			name: 'test2',
+			imgUrl: 'img/10/4.png',
+			img: null
+		},{
 			name: 'test2',
 			imgUrl: 'img/10/5.png',
 			img: null
-		},
+		}],
 		size: {
-			x: 2,
-			y: 2
-		}
-	},{//第11关
-		answer: {
-			name: 'test1',
-			imgUrl: 'img/11/1.png',
-			img: null//缓存图片对象
-		}, 
-		other: {
-			name: 'test2',
-			imgUrl: 'img/11/5.png',
-			img: null
-		},
-		size: {
-			x: 2,
-			y: 2
-		}
-	},{//第12关
-		answer: {
-			name: 'test1',
-			imgUrl: 'img/12/1.png',
-			img: null//缓存图片对象
-		}, 
-		other: {
-			name: 'test2',
-			imgUrl: 'img/12/5.png',
-			img: null
-		},
-		size: {
-			x: 2,
-			y: 2
-		}
-	},{//第13关
-		answer: {
-			name: 'test1',
-			imgUrl: 'img/13/1.png',
-			img: null//缓存图片对象
-		}, 
-		other: {
-			name: 'test2',
-			imgUrl: 'img/13/5.png',
-			img: null
-		},
-		size: {
-			x: 2,
-			y: 2
-		}
-	},{//第14关
-		answer: {
-			name: 'test1',
-			imgUrl: 'img/14/1.png',
-			img: null//缓存图片对象
-		}, 
-		other: {
-			name: 'test2',
-			imgUrl: 'img/14/5.png',
-			img: null
-		},
-		size: {
-			x: 2,
-			y: 2
-		}
-	},{//第15关
-		answer: {
-			name: 'test1',
-			imgUrl: 'img/15/1.png',
-			img: null//缓存图片对象
-		}, 
-		other: {
-			name: 'test2',
-			imgUrl: 'img/15/5.png',
-			img: null
-		},
-		size: {
-			x: 2,
-			y: 2
-		}
-	},{//第16关
-		answer: {
-			name: 'test1',
-			imgUrl: 'img/16/1.png',
-			img: null//缓存图片对象
-		}, 
-		other: {
-			name: 'test2',
-			imgUrl: 'img/16/5.png',
-			img: null
-		},
-		size: {
-			x: 2,
-			y: 2
-		}
-	},{//第17关
-		answer: {
-			name: 'test1',
-			imgUrl: 'img/17/1.png',
-			img: null//缓存图片对象
-		}, 
-		other: {
-			name: 'test2',
-			imgUrl: 'img/17/5.png',
-			img: null
-		},
-		size: {
-			x: 2,
-			y: 2
-		}
-	},{//第18关
-		answer: {
-			name: 'test1',
-			imgUrl: 'img/18/1.png',
-			img: null//缓存图片对象
-		}, 
-		other: {
-			name: 'test2',
-			imgUrl: 'img/18/5.png',
-			img: null
-		},
-		size: {
-			x: 2,
-			y: 2
-		}
-	},{//第19关
-		answer: {
-			name: 'test1',
-			imgUrl: 'img/4/1.png',
-			img: null//缓存图片对象
-		}, 
-		other: {
-			name: 'test2',
-			imgUrl: 'img/4/5.png',
-			img: null
-		},
-		size: {
-			x: 2,
-			y: 2
-		}
-	},{//第20关
-		answer: {
-			name: 'test1',
-			imgUrl: 'img/4/1.png',
-			img: null//缓存图片对象
-		}, 
-		other: {
-			name: 'test2',
-			imgUrl: 'img/4/5.png',
-			img: null
-		},
-		size: {
-			x: 2,
-			y: 2
-		}
-	},{//第21关
-		answer: {
-			name: 'test1',
-			imgUrl: 'img/4/1.png',
-			img: null//缓存图片对象
-		}, 
-		other: {
-			name: 'test2',
-			imgUrl: 'img/4/5.png',
-			img: null
-		},
-		size: {
-			x: 2,
-			y: 2
-		}
-	},{//第22关
-		answer: {
-			name: 'test1',
-			imgUrl: 'img/4/1.png',
-			img: null//缓存图片对象
-		}, 
-		other: {
-			name: 'test2',
-			imgUrl: 'img/4/5.png',
-			img: null
-		},
-		size: {
-			x: 2,
-			y: 2
-		}
-	},{//第23关
-		answer: {
-			name: 'test1',
-			imgUrl: 'img/4/1.png',
-			img: null//缓存图片对象
-		}, 
-		other: {
-			name: 'test2',
-			imgUrl: 'img/4/5.png',
-			img: null
-		},
-		size: {
-			x: 2,
-			y: 2
-		}
-	},{//第24关
-		answer: {
-			name: 'test1',
-			imgUrl: 'img/4/1.png',
-			img: null//缓存图片对象
-		}, 
-		other: {
-			name: 'test2',
-			imgUrl: 'img/4/5.png',
-			img: null
-		},
-		size: {
-			x: 2,
+			x: 3,
 			y: 2
 		}
 	}]
 
 	var _buffer = function(){//缓存图片数据
+		var step = Math.ceil(50/data.length)+1;
 		for(var i=0; i<data.length; i++){
 			data[i].answer.img = new Image();
 			data[i].answer.img.src = data[i].answer.imgUrl;
-			data[i].other.img = new Image();
-			data[i].other.img.src = data[i].other.imgUrl;
+
+			if(data[i].other instanceof Array){//特殊关卡处理
+				for(var n = 0; n <data[i].other.length; n++){
+					data[i].other[n].img = new Image();
+					data[i].other[n].img.src = data[i].other[n].imgUrl;
+				}
+			} else {
+				data[i].other.img = new Image();
+				data[i].other.img.src = data[i].other.imgUrl;
+				data[i].answer.img.onload = function(){
+					loading.percent(step);
+				}
+
+				data[i].other.img.onload = function(){
+					loading.percent(step);
+				}
+			}
+			 
+			 
+
+			 
 		}
 	}
 
@@ -604,6 +568,119 @@
 
 
 	 
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	
+	var loading = {
+		count: 0,
+		percent: function(num){
+			this.count += num;
+			$('#loading').text(this.count);
+			if(this.count >= 100){
+				this.finish();
+			}
+
+		 
+		},
+		init: function(){
+			var _this = this;
+			var timer = setTimeout(function(){
+				_this.finish();
+			},3000);
+
+			var timer = setInterval(function(){
+				var aim = $('#undergoing');
+				var under = $('#undergoing').text();
+				switch(under){
+					case '':{
+						aim.text('.');
+						break;
+					}
+					case '.':{
+						aim.text('..');
+						break;
+					}
+					case '..':{
+						aim.text('...');
+						break;
+					}
+					case '...':{
+						aim.text('');
+						break;
+					}
+				}
+			}, 500);
+
+		},
+		finish: function(){
+			$('#loading-layout').css('display', 'none');
+		}
+	}
+
+	loading.init();
+
+	module.exports = loading
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	var l1 = '木门学徒';
+	var l2 = '木门新秀';
+	var l3 = '木门大师';
+	var l4 = '木门之神';
+
+	var level = [l1,l1,l1,l1,l1,l1,
+	l2,l2,l2,l2,l2,l2,
+	l3,l3,l3,l3,l3,l3,
+	l4,l4,l4,l4,l4,l4];
+
+	module.exports.getLevel = function(stage){
+		return level[stage];
+	}
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	var music = {
+		init: function(){
+			var _this = this;
+			$(document).on('click', '#music', function(){
+				var sta = $(this).data('state');
+				if(sta == 'start'){
+					$(this).data('state', 'pause');
+					_this.pause();
+				}
+				if(sta == 'pause'){
+					$(this).data('state','start');
+					_this.start();
+				}
+			});
+		},
+		pause: function(){
+			$('#music')
+			.removeClass('music-button-s')
+			.removeClass('music-button-p')
+			.addClass('music-button-s');
+			var a = document.getElementById('audio-bg');
+			a.pause();
+		},
+		start: function(){
+			$('#music')
+			.removeClass('music-button-s')
+			.removeClass('music-button-p')
+			.addClass('music-button-p');
+			var a = document.getElementById('audio-bg');
+			a.play();
+		}
+	}
+	music.init();
+	module.exports = music;
 
 /***/ }
 /******/ ]);

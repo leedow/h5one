@@ -1,6 +1,7 @@
 @charset "UTF-8";
 html,
 body {
+  width: 100%;
   height: 100%;
 }
 body {
@@ -9,7 +10,7 @@ body {
   color: #565a5c;
   line-height: 1.5;
   text-align: center;
-  min-height: 100%;
+  height: 100%;
   background: #2B1601;
 }
 * {
@@ -79,6 +80,12 @@ button:hover {
 }
 p {
   padding: 11.2px 0;
+}
+input,
+button,
+select,
+textarea {
+  outline: none;
 }
 /**
  * Grid
@@ -223,14 +230,14 @@ p {
 }
 #header {
   overflow: hidden;
-  padding: 20px;
+  padding: 20px 20px 10px 20px;
 }
 #header #score-box {
   float: left;
 }
 #header #score-box .score,
 #header #score-box .time {
-  font-size: 18px;
+  font-size: 22px;
   color: #DAB958;
   text-align: left;
 }
@@ -246,38 +253,189 @@ p {
 .item-box {
   background: #FECE7A;
   border-radius: 5px;
-  margin: 15px;
+  margin: 5px 15px;
   padding: 10px;
   overflow: hidden;
 }
 .item-col {
-  padding: 5px;
+  padding: 4px;
 }
 .item-col .item img {
   width: 100%;
+  vertical-align: bottom;
 }
 .layout {
-  position: fixed;
+  position: absolute;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
   background: #2B1601;
 }
-.layout > img {
+.layout img {
   width: 100%;
+  height: 100%;
+  vertical-align: bottom;
 }
-.layout > .button {
-  position: absolute;
-  bottom: 0px;
-  left: 0px;
-  padding: 20px;
+.layout .btn {
   background: none;
   border: 0;
 }
-.layout > .button img {
+.layout .button {
+  position: absolute;
+  bottom: 20px;
+  left: 0px;
+  padding: 0 40px;
+  background: none;
+  border: 0;
+}
+.layout .button img {
   width: 100%;
 }
 #pause-layout {
   display: none;
+}
+#end-layout {
+  display: none;
+}
+#restart-layout {
+  display: none;
+}
+#restart-layout > .level {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -175px;
+  margin-left: -125px;
+  width: 250px;
+  height: 350px;
+}
+#restart-layout > .level .lv {
+  color: #DAB958;
+  font-size: 58px;
+  margin-bottom: 20px;
+}
+#restart-layout > .level .lv p {
+  margin: 0;
+  padding: 0;
+}
+#restart-layout > .level .buttons {
+  width: 220px;
+  clear: both;
+}
+#loading-layout > .loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  margin-left: -100px;
+  font-size: 28px;
+  color: #DAB958;
+}
+#loading-layout > .loading p {
+  margin: 0;
+  padding: 0;
+}
+@keyframes wrong {
+  0% {
+    -webkit-transform: rotate(20deg);
+            transform: rotate(20deg);
+  }
+  25% {
+    -webkit-transform: rotate(-20deg);
+            transform: rotate(-20deg);
+  }
+  50% {
+    -webkit-transform: rotate(20deg);
+            transform: rotate(20deg);
+  }
+  75% {
+    -webkit-transform: rotate(-20deg);
+            transform: rotate(-20deg);
+  }
+  100% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+}
+@-webkit-keyframes wrong {
+  /* Safari 和 Chrome */
+  0% {
+    -webkit-transform: rotate(20deg);
+  }
+  25% {
+    -webkit-transform: rotate(-20deg);
+  }
+  50% {
+    -webkit-transform: rotate(20deg);
+  }
+  75% {
+    -webkit-transform: rotate(-20deg);
+  }
+  100% {
+    -webkit-transform: rotate(0deg);
+  }
+}
+.error {
+  animation: wrong 0.5s ease-in-out;
+  -webkit-animation: wrong 0.5s ease-in-out;
+}
+@keyframes scaleUp {
+  from {
+    opacity: 1;
+    -webkit-transform: scale(0.4);
+            transform: scale(0.4);
+  }
+}
+@-webkit-keyframes scaleUp {
+  from {
+    opacity: 1;
+    -webkit-transform: scale(0.4);
+  }
+}
+.show {
+  animation: scaleUp 0.2s ease-in-out;
+  -webkit-animation: scaleUp 0.2s ease-in-out;
+}
+@keyframes scaleOut {
+  from {
+    opacity: 1;
+    -webkit-transform: scale(1);
+            transform: scale(1);
+  }
+  to {
+    -webkit-transform: scale(0);
+            transform: scale(0);
+  }
+}
+@-webkit-keyframes scaleOut {
+  from {
+    opacity: 1;
+    -webkit-transform: scale(1);
+  }
+  to {
+    -webkit-transform: scale(0);
+  }
+}
+.hide {
+  animation: scaleOut 0.2s ease-in-out;
+  -webkit-animation: scaleOut 0.2s ease-in-out;
+}
+.music-button {
+  width: 30px;
+  height: 30px;
+  border: 1px #999 solid;
+  border-radius: 15px;
+  position: absolute;
+  left: 15px;
+  bottom: 15px;
+  background: rgba(0, 0, 0, 0.5);
+}
+.music-button-p {
+  background: url(../img/music-p.png) center center no-repeat rgba(0, 0, 0, 0.5);
+  background-size: 16px 16px;
+}
+.music-button-s {
+  background: url(../img/music-s.png) center center no-repeat rgba(0, 0, 0, 0.5);
+  background-size: 16px 16px;
 }

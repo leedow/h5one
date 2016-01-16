@@ -8,6 +8,7 @@ var stage = {
 	init: function(){
 		var _this = this;
 		_this.currentData = storage.getData(1);
+		_this.currentStage = 1;
 		_this.totalStage = storage.getLength();
 	},
 	check: function(name){//检查是否正确
@@ -18,6 +19,9 @@ var stage = {
 	},
 	getCurrentStage: function(){
 		return this.currentStage;
+	},
+	getTotalStage: function(){
+		return this.totalStage;
 	},
 	passStage: function(){//更新下关数据
 		var _this = this;

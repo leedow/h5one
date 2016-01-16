@@ -1,20 +1,27 @@
 .layout{
-	position: fixed;
+	position: absolute;
 	left:0;
 	top:0;
 	width: 100%;
-	height: 100%;
+ 	height: 100%;
 	background:#2B1601;
 
-	>img{
+	img{
 		width: 100%;
+		height: 100%;
+		vertical-align: bottom;
 	}
 
-	>.button{
+	.btn{
+		background: none;
+		border:0;
+	}
+
+	.button{
 		position: absolute;
-		bottom:0px;
+		bottom:20px;
 		left:0px;
-		padding:20px;
+		padding:0 40px;
 		background: none;
 		border:0;
 		img{
@@ -27,5 +34,59 @@
 	display: none;
 	.pause-button{
 		 
+	}
+}
+
+#end-layout{
+	display: none;
+	.pause-button{
+		 
+	}
+}
+
+#restart-layout{
+	>.level{
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -175px;
+		margin-left: -125px;
+		width:250px;
+		height:350px;
+
+		.lv{
+			color:#DAB958;
+			font-size: 58px;
+			margin-bottom:20px;
+			p{
+				margin:0;
+				padding:0;
+			}
+		}
+
+		.buttons{
+			width:220px;
+			clear:both;
+		}
+	}
+
+	display: none;
+	.pause-button{
+		 
+	}
+}
+
+#loading-layout{
+	>.loading {
+		position: absolute;
+		top:50%;
+		left:50%;
+		width: 200px;
+		margin-left: -100px;
+		font-size: 28px;
+		color:#DAB958;
+		p{
+			margin:0;padding:0;
+		}
 	}
 }
